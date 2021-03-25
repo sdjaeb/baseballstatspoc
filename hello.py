@@ -1,6 +1,6 @@
 from flask import Flask
-from flask import request
 
+import requests
 import httpx
 import json
 
@@ -31,7 +31,10 @@ def get_stats_from_api():
 			bats/throws,
 			position
 	'''
-	return 'Stats from API'
+	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27pu%25%27"
+	response = requests.get(url)
+	print(response.content)
+	return response.json()
 
 @app.route('/json-stats')
 def get_stats_from_json():
