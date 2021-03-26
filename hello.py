@@ -12,14 +12,18 @@ app = Flask(__name__)
 def index():
     return 'Index Page'
 
-@app.route('/hello')
-def hello_world():
-    return 'Hello, World!'
+@app.route('/combined-stats')
+def get_combined_stats():
+	api_stats = get_stats_from_api()
+	print(api_stats)
+	json_stats = get_stats_from_json()
+	print(json_stats)
+
+	return jsonify(api_stats + json_stats)
 
 '''
 	Eventually pass in filter (partial name, positions, team, etc)
 '''
-@app.route('/api-stats')
 def get_stats_from_api():
 	'''
 		http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27pu%25%27
@@ -44,9 +48,8 @@ def get_stats_from_api():
 		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
 		players.append(filteredPlayerInfo)
 
-	return jsonify(players[:10])
+	return players[:10]
 
-@app.route('/json-stats')
 def get_stats_from_json():
 	'''
 		Load player_stats.json
@@ -71,4 +74,12 @@ def get_stats_from_json():
 		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
 		players.append(filteredPlayerInfo)
 
-	return jsonify(players[:10])
+	return players[:10]
+
+@app.route('/api-stats')
+def api_stats():
+	return jsonify(get_stats_from_api())
+
+@app.route('/json-stats')
+def json_stats():
+	return jsonify(get_stats_from_json())
