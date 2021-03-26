@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import jsonify
 
 import requests
 import httpx
@@ -32,9 +33,21 @@ def get_stats_from_api():
 			position
 	'''
 	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27pu%25%27"
-	response = requests.get(url)
-	print(response.content)
-	return response.json()
+	response = requests.get(url).json()
+	# print(response)
+
+	normalizedFields = [ 'position', 'weight', 'height_inches', 'bats', 'name_first', 'height_feet', 'team_full', 'throws', 'name_last' ]
+
+	# Extract the necessary data
+	# Iterate over the response object
+	players = []
+	for playerInfo in response['search_player_all']['queryResults']['row']:
+		print('*** ', playerInfo)
+		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
+		print('---- ', filteredPlayerInfo)
+		players.append(filteredPlayerInfo)
+
+	return jsonify(players)
 
 @app.route('/json-stats')
 def get_stats_from_json():
