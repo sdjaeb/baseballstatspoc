@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 
+import player
 import requests
 import json
 
@@ -40,7 +41,7 @@ def normalize_player_info(player_list: list, field_names: list, N: int = 10) -> 
 				normalized_field_name = normalized_field_names[field_names.index(k)]
 				filtered_and_normalized_player_info[normalized_field_name] = v
 
-			players.append(filtered_and_normalized_player_info)
+			players.append(player.Player(filtered_and_normalized_player_info))
 	except NameError:
 		print('NameError - player_list for loop')
 		return 'NameError - player_list for loop'
@@ -145,7 +146,6 @@ def get_combined_stats(numrows: str = '10'):
 @app.route('/api-stats/')
 @app.route('/api-stats/<numrows>/')
 def api_stats(numrows: str = '10'):
-	print(numrows)
 	try:
 		rendered_template = render_template('player_list.html', data = get_stats_from_api(int(numrows)))
 	except NameError:

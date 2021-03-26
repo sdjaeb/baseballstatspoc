@@ -21,12 +21,12 @@
 
 {% for playerInfo in data %}
 	<tr>
-		<td>{{ playerInfo['nameFirst'] }} {{ playerInfo['nameLast'] }}</td>
-		<td>{{ playerInfo['position'] }}</td>
-		<td>{{ playerInfo['heightFeet'] }}' {{ playerInfo['heightInches'] }}"</td>
-		<td>{{ playerInfo['weight'] }} lbs</td>
-		<td>{{ playerInfo['throws'] }}/{{ playerInfo['bats'] }}</td>
-		<td>{{ playerInfo['fullTeamName'] }}</td>
+		<td>{{ playerInfo.data['nameFirst'] }} {{ playerInfo.data['nameLast'] }}</td>
+		<td>{{ playerInfo.data['position'] }}</td>
+		<td>{{ playerInfo.data['heightFeet'] }}' {{ playerInfo.data['heightInches'] }}"</td>
+		<td>{{ playerInfo.data['weight'] }} lbs</td>
+		<td>{{ playerInfo.data['throws'] }}/{{ playerInfo.data['bats'] }}</td>
+		<td>{{ playerInfo.data['fullTeamName'] }}</td>
 	</tr>
 {% endfor %}
 </table>
