@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 
-def normalize_player_info(player_list, field_names, N=10) -> list:
+def normalize_player_info(player_list: list, field_names: list, N: int = 10) -> list:
 	"""Preps the data from disparate data sources to use a common schema"""
 	players = []
 	fieldNames = [
@@ -48,9 +48,9 @@ def normalize_player_info(player_list, field_names, N=10) -> list:
 		# return the first N players
 		return players[:N]
 
-def get_stats_from_api() -> list:
+def get_stats_from_api(numrows: int = 10) -> list:
 	"""Gets player info and stats from an api"""
-	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27a%25%27"
+	url = 'http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27a%25%27'
 	try:
 		response = requests.get(url).json()
 	except json.decoder.JSONDecodeError:
@@ -70,7 +70,7 @@ def get_stats_from_api() -> list:
 	]
 
 	try:
-		normalizedPlayerInfo = normalize_player_info(response['search_player_all']['queryResults']['row'], fieldsToPluck, 10)
+		normalizedPlayerInfo = normalize_player_info(response['search_player_all']['queryResults']['row'], fieldsToPluck, numrows)
 	except KeyError:
 		print('KeyError - get_stats_from_api - issue with key in normalize_player_info')
 		return 'KeyError - get_stats_from_api - issue with key in normalize_player_info'
@@ -80,7 +80,7 @@ def get_stats_from_api() -> list:
 
 	return normalizedPlayerInfo
 
-def get_stats_from_json() -> list:
+def get_stats_from_json(numrows: int = 10) -> list:
 	"""Gets player info and stats from a json file"""
 	try:
 		f = open('mlbplayers.json',)
@@ -107,7 +107,7 @@ def get_stats_from_json() -> list:
 	]
 
 	try:
-		normalizedPlayerInfo = normalize_player_info(rawPlayerData['players'], fieldsToPluck, 10)
+		normalizedPlayerInfo = normalize_player_info(rawPlayerData['players'], fieldsToPluck, numrows)
 	except KeyError:
 		print('KeyError - get_stats_from_json - Invalid key in rawPlayerData')
 		return 'KeyError - get_stats_from_json - Invalid key in rawPlayerData'
@@ -118,13 +118,15 @@ def get_stats_from_json() -> list:
 		return normalizedPlayerInfo
 
 @app.route('/')
+@app.route('/<numrows>')
 @app.route('/combined-stats')
-def get_combined_stats():
-	api_stats = get_stats_from_api()
-	json_stats = get_stats_from_json()
+@app.route('/combined-stats/<numrows>')
+def get_combined_stats(numrows: str = '10'):
+	api_stats = get_stats_from_api(int(numrows))
+	json_stats = get_stats_from_json(int(numrows))
 
 	try:
-		rendered_template = render_template('player_list.html', data=(api_stats + json_stats))
+		rendered_template = render_template('player_list.html', data = (api_stats + json_stats))
 	except NameError:
 		print('NameError - get_combined_stats')
 		return 'NameError - get_combined_stats'
@@ -138,9 +140,11 @@ def get_combined_stats():
 		return rendered_template
 
 @app.route('/api-stats')
-def api_stats():
+@app.route('/api-stats/<numrows>')
+def api_stats(numrows: str = '10'):
+	print(numrows)
 	try:
-		rendered_template = render_template('player_list.html', data=get_stats_from_api1())
+		rendered_template = render_template('player_list.html', data = get_stats_from_api(int(numrows)))
 	except NameError:
 		print('NameError - api_stats')
 		return 'NameError - api_stats'
@@ -154,9 +158,10 @@ def api_stats():
 		return rendered_template
 
 @app.route('/json-stats')
-def json_stats():
+@app.route('/json-stats/<numrows>')
+def json_stats(numrows: str = '10'):
 	try:
-		rendered_template = render_template('player_list.html1', data=get_stats_from_json())
+		rendered_template = render_template('player_list.html', data = get_stats_from_json(int(numrows)))
 	except NameError:
 		print('NameError - json_stats')
 		return 'NameError - json_stats'
