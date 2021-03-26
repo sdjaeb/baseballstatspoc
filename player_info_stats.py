@@ -9,7 +9,7 @@ app = Flask(__name__)
 def normalize_player_info(player_list: list, field_names: list, N: int = 10) -> list:
 	"""Preps the data from disparate data sources to use a common schema"""
 	players = []
-	fieldNames = [
+	normalized_field_names = [
 		'position',
 		'weight',
 		'heightInches',
@@ -23,24 +23,24 @@ def normalize_player_info(player_list: list, field_names: list, N: int = 10) -> 
 
 	# pluck the fields from the player list specified by the field_names
 	try:
-		for playerInfo in player_list:
+		for player_info in player_list:
 			# filter out the data we don't need
 			try:
-				filteredPlayerInfo = { key: playerInfo[key] for key in field_names }
+				filtered_player_info = { key: player_info[key] for key in field_names }
 			except KeyError:
-				print('KeyError - normalize_player_info - missing key in playerInfo loop')
-				return 'KeyError - normalize_player_info - missing key in playerInfo loop'
+				print('KeyError - normalize_player_info - missing key in player_info loop')
+				return 'KeyError - normalize_player_info - missing key in player_info loop'
 			except NameError:
-				print('NameError - normalize_player_info - name error in playerInfo loop')
-				return 'NameError - normalize_player_info - name error in playerInfo loop'
+				print('NameError - normalize_player_info - name error in player_info loop')
+				return 'NameError - normalize_player_info - name error in player_info loop'
 
 			# normalize the field names
-			filteredAndNormalizedPlayerInfo = {}
-			for k, v in filteredPlayerInfo.items():
-				normalizedFieldName = fieldNames[field_names.index(k)]
-				filteredAndNormalizedPlayerInfo[normalizedFieldName] = v
+			filtered_and_normalized_player_info = {}
+			for k, v in filtered_player_info.items():
+				normalized_field_name = normalized_field_names[field_names.index(k)]
+				filtered_and_normalized_player_info[normalized_field_name] = v
 
-			players.append(filteredAndNormalizedPlayerInfo)
+			players.append(filtered_and_normalized_player_info)
 	except NameError:
 		print('NameError - player_list for loop')
 		return 'NameError - player_list for loop'
@@ -60,7 +60,7 @@ def get_stats_from_api(numrows: int = 10) -> list:
 		print('JSONDecodeError - get_stats_from_api - There was an error decoding the json from the response')
 		return 'JSONDecodeError - get_stats_from_api - There was an error decoding the json from the response'
 
-	fieldsToPluck = [
+	fields_to_pluck = [
 		'position',
 		'weight',
 		'height_inches',
@@ -73,7 +73,7 @@ def get_stats_from_api(numrows: int = 10) -> list:
 	]
 
 	try:
-		normalizedPlayerInfo = normalize_player_info(response['search_player_all']['queryResults']['row'], fieldsToPluck, numrows)
+		normalized_player_info = normalize_player_info(response['search_player_all']['queryResults']['row'], fields_to_pluck, numrows)
 	except KeyError:
 		print('KeyError - get_stats_from_api - issue with key in normalize_player_info')
 		return 'KeyError - get_stats_from_api - issue with key in normalize_player_info'
@@ -81,7 +81,7 @@ def get_stats_from_api(numrows: int = 10) -> list:
 		print('NameError - get_stats_from_api - issue with a name near normalize_player_info')
 		return 'NameError - get_stats_from_api - issue with a name near normalize_player_info'
 
-	return normalizedPlayerInfo
+	return normalized_player_info
 
 def get_stats_from_json(numrows: int = 10) -> list:
 	"""Gets player info and stats from a json file"""
@@ -92,12 +92,12 @@ def get_stats_from_json(numrows: int = 10) -> list:
 		return 'FileNotFoundError - get_stats_from_json'
 
 	try:
-		rawPlayerData = json.load(f)
+		raw_player_data = json.load(f)
 	except NameError:
-		print('NameError - get_stats_from_json loading rawPlayerData')
-		return 'NameError - get_stats_from_json loading rawPlayerData'
+		print('NameError - get_stats_from_json loading raw_player_data')
+		return 'NameError - get_stats_from_json loading raw_player_data'
 
-	fieldsToPluck = [
+	fields_to_pluck = [
 		'position',
 		'weightLbs',
 		'heightIn',
@@ -110,15 +110,15 @@ def get_stats_from_json(numrows: int = 10) -> list:
 	]
 
 	try:
-		normalizedPlayerInfo = normalize_player_info(rawPlayerData['players'], fieldsToPluck, numrows)
+		normalized_player_info = normalize_player_info(raw_player_data['players'], fields_to_pluck, numrows)
 	except KeyError:
-		print('KeyError - get_stats_from_json - Invalid key in rawPlayerData')
-		return 'KeyError - get_stats_from_json - Invalid key in rawPlayerData'
+		print('KeyError - get_stats_from_json - Invalid key in raw_player_data')
+		return 'KeyError - get_stats_from_json - Invalid key in raw_player_data'
 	except NameError:
-		print('NameError - get_stats_from_json - something happened assigning normalizedPlayerInfo')
-		return 'NameError - get_stats_from_json - something happened assigning normalizedPlayerInfo'
+		print('NameError - get_stats_from_json - something happened assigning normalized_player_info')
+		return 'NameError - get_stats_from_json - something happened assigning normalized_player_info'
 	else:
-		return normalizedPlayerInfo
+		return normalized_player_info
 
 @app.route('/')
 @app.route('/<numrows>/')
