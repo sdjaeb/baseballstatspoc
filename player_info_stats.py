@@ -118,9 +118,9 @@ def get_stats_from_json(numrows: int = 10) -> list:
 		return normalizedPlayerInfo
 
 @app.route('/')
-@app.route('/<numrows>')
-@app.route('/combined-stats')
-@app.route('/combined-stats/<numrows>')
+@app.route('/<numrows>/')
+@app.route('/combined-stats/')
+@app.route('/combined-stats/<numrows>/')
 def get_combined_stats(numrows: str = '10'):
 	api_stats = get_stats_from_api(int(numrows))
 	json_stats = get_stats_from_json(int(numrows))
@@ -139,8 +139,8 @@ def get_combined_stats(numrows: str = '10'):
 	else:
 		return rendered_template
 
-@app.route('/api-stats')
-@app.route('/api-stats/<numrows>')
+@app.route('/api-stats/')
+@app.route('/api-stats/<numrows>/')
 def api_stats(numrows: str = '10'):
 	print(numrows)
 	try:
@@ -157,8 +157,8 @@ def api_stats(numrows: str = '10'):
 	else:
 		return rendered_template
 
-@app.route('/json-stats')
-@app.route('/json-stats/<numrows>')
+@app.route('/json-stats/')
+@app.route('/json-stats/<numrows>/')
 def json_stats(numrows: str = '10'):
 	try:
 		rendered_template = render_template('player_list.html', data = get_stats_from_json(int(numrows)))
