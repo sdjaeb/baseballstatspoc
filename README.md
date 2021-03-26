@@ -5,12 +5,29 @@ Install Flask (https://flask.palletsprojects.com/en/1.1.x/installation/#install-
 
 `pip install requests`
 
-# Notes
-1. There is no error/exception handling.  A few things I would add:
-    1. An error/404 page when the `requests.get` fails: 
-    2. Checking against the various lists/dictionaries: KeyError, IndexError, TypeError
-    3. File actions: FileNotFoundError, EOFError,  
-    4. Fallback to Exception
-2. Parameters on the various stats retrieval functions, to refine the data to retrieve.
-    1. How many records from the data source
-    2. Name Parts, Throws/Bats, Position, Team Played For, Height, Weight
+## Data Sources
+1. JSON file:
+
+    http://127.0.0.1:5000/json-stats/
+
+2. API:
+
+    http://127.0.0.1:5000/api-stats/
+
+3. Aggregate sources (JSON file and API) - will return num rows from each source
+   
+   http://127.0.0.1:5000/ -or-
+   
+   http://127.0.0.1:5000/combined-stats/
+
+## Changing the number of rows returned
+The number of records returned defaults to 10.
+    
+    Getting data from an api source:
+    ex: http://127.0.0.1:5000/api-stats/
+
+If you want more or less than 10, append the number to the URL
+    
+    ex: http://127.0.0.1:5000/api-stats/5/
+    
+Negative values will do a reverse slice. Anything less than -1 will clamp at -1.
