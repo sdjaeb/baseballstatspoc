@@ -7,6 +7,7 @@ import json
 app = Flask(__name__)
 
 def normalize_player_info(player_list, field_names, N=10):
+	"""Preps the data from disparate data sources to use a common schema"""
 	players = []
 	fieldNames = [
 		'position',
@@ -20,7 +21,9 @@ def normalize_player_info(player_list, field_names, N=10):
 		'nameLast'
 	]
 
+	# pluck the fields from the player list specified by the field_names
 	for playerInfo in player_list:
+		# filter out the data we don't need
 		filteredPlayerInfo = { key: playerInfo[key] for key in field_names }
 
 		# normalize the field names
@@ -31,9 +34,11 @@ def normalize_player_info(player_list, field_names, N=10):
 
 		players.append(filteredAndNormalizedPlayerInfo)
 
+	# return the first N players
 	return players[:N]
 
-def get_stats_from_api():
+def get_stats_from_api() -> list:
+	"""Gets player info and stats from an api"""
 	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27a%25%27"
 	response = requests.get(url).json()
 
@@ -51,7 +56,8 @@ def get_stats_from_api():
 
 	return normalize_player_info(response['search_player_all']['queryResults']['row'], fieldsToPluck, 10)
 
-def get_stats_from_json():
+def get_stats_from_json() -> list:
+	"""Gets player info and stats from a json file"""
 	f = open("mlbplayers.json",)
 	rawPlayerData = json.load(f)
 
