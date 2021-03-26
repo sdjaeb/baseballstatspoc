@@ -45,8 +45,11 @@ def normalize_player_info(player_list: list, field_names: list, N: int = 10) -> 
 		print('NameError - player_list for loop')
 		return 'NameError - player_list for loop'
 	else:
-		# return the first N players
-		return players[:N]
+		# return the first N players - if N < -1 then make it -1
+		if N < -1:
+			return players[:-1]
+		else:
+			return players[:N]
 
 def get_stats_from_api(numrows: int = 10) -> list:
 	"""Gets player info and stats from an api"""
