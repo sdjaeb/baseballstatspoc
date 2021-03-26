@@ -32,7 +32,7 @@ def get_stats_from_api():
 			bats/throws,
 			position
 	'''
-	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27pu%25%27"
+	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27a%25%27"
 	response = requests.get(url).json()
 
 	normalizedFields = [ 'position', 'weight', 'height_inches', 'bats', 'name_first', 'height_feet', 'team_full', 'throws', 'name_last' ]
@@ -44,7 +44,7 @@ def get_stats_from_api():
 		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
 		players.append(filteredPlayerInfo)
 
-	return jsonify(players)
+	return jsonify(players[:10])
 
 @app.route('/json-stats')
 def get_stats_from_json():
@@ -71,4 +71,4 @@ def get_stats_from_json():
 		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
 		players.append(filteredPlayerInfo)
 
-	return jsonify(players)
+	return jsonify(players[:10])
