@@ -2,7 +2,6 @@ from flask import Flask
 from flask import jsonify
 
 import requests
-import httpx
 import json
 
 app = Flask(__name__)
@@ -21,60 +20,68 @@ def get_combined_stats():
 
 	return jsonify(api_stats + json_stats)
 
-'''
-	Eventually pass in filter (partial name, positions, team, etc)
-'''
+def normalize_player_info(player_list, field_names, N=10):
+	players = []
+	fieldNames = [
+		'position',
+		'weight',
+		'heightInches',
+		'bats',
+		'nameFirst',
+		'heightFeet',
+		'fullTeamName',
+		'throws',
+		'nameLast'
+	]
+
+	for playerInfo in player_list:
+		filteredPlayerInfo = { key: playerInfo[key] for key in field_names }
+
+		# normalize the field names
+		filteredAndNormalizedPlayerInfo = {}
+		for k, v in filteredPlayerInfo.items():
+			normalizedFieldName = fieldNames[field_names.index(k)]
+			filteredAndNormalizedPlayerInfo[normalizedFieldName] = v
+
+		players.append(filteredAndNormalizedPlayerInfo)
+
+	return players[:N]
+
 def get_stats_from_api():
-	'''
-		http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27pu%25%27
-		Only return:
-			full name,
-			full team name,
-			player id,
-			weight,
-			height (ft' in"),
-			bats/throws,
-			position
-	'''
 	url = "http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27mlb%27&active_sw=%27Y%27&name_part=%27a%25%27"
 	response = requests.get(url).json()
 
-	normalizedFields = [ 'position', 'weight', 'height_inches', 'bats', 'name_first', 'height_feet', 'team_full', 'throws', 'name_last' ]
+	fieldsToPluck = [
+		'position',
+		'weight',
+		'height_inches',
+		'bats',
+		'name_first',
+		'height_feet',
+		'team_full',
+		'throws',
+		'name_last'
+	]
 
-	# Extract the necessary data
-	# Iterate over the response object
-	players = []
-	for playerInfo in response['search_player_all']['queryResults']['row']:
-		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
-		players.append(filteredPlayerInfo)
-
-	return players[:10]
+	return normalize_player_info(response['search_player_all']['queryResults']['row'], fieldsToPluck, 10)
 
 def get_stats_from_json():
-	'''
-		Load player_stats.json
-		Only return:
-			full name,
-			full team name,
-			player id,
-			weight,
-			height (ft' in"),
-			bats/throws,
-			position
-	'''
 	f = open("mlbplayers.json",)
 	rawPlayerData = json.load(f)
 
-	normalizedFields = [ 'position', 'weightLbs', 'heightIn', 'bats', 'firstName', 'heightFt', 'teamName', 'throws', 'lastName' ]
+	fieldsToPluck = [
+		'position',
+		'weightLbs',
+		'heightIn',
+		'bats',
+		'firstName',
+		'heightFt',
+		'teamName',
+		'throws',
+		'lastName'
+	]
 
-	# Extract the necessary data
-	# Iterate over the response object
-	players = []
-	for playerInfo in rawPlayerData['players']:
-		filteredPlayerInfo = { normalizedKey: playerInfo[normalizedKey] for normalizedKey in normalizedFields }
-		players.append(filteredPlayerInfo)
-
-	return players[:10]
+	return normalize_player_info(rawPlayerData['players'], fieldsToPluck, 10)
 
 @app.route('/api-stats')
 def api_stats():
