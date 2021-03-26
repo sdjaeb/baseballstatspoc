@@ -1,0 +1,32 @@
+<!doctype html>
+<title>Player Info</title>
+<h1>Player List</h1>
+<style>
+	table td { width: 150px; }
+
+	tbody tr:nth-child(odd) {
+		background-color: #ccc;
+	}
+</style>
+
+<table>
+	<tr>
+		<th>Player Name</th>
+		<th>Position</th>
+		<th>Height</th>
+		<th>Weight</th>
+		<th>Throws/Bats</th>
+		<th>Team Played For</th>
+	</tr>
+
+{% for playerInfo in data %}
+	<tr>
+		<td>{{ playerInfo['nameFirst'] }} {{ playerInfo['nameLast'] }}</td>
+		<td>{{ playerInfo['position'] }}</td>
+		<td>{{ playerInfo['heightFeet'] }}' {{ playerInfo['heightInches'] }}"</td>
+		<td>{{ playerInfo['weight'] }} lbs</td>
+		<td>{{ playerInfo['throws'] }}/{{ playerInfo['bats'] }}</td>
+		<td>{{ playerInfo['fullTeamName'] }}</td>
+	</tr>
+{% endfor %}
+</table>

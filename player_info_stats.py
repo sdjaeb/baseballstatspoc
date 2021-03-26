@@ -1,24 +1,10 @@
 from flask import Flask
-from flask import jsonify
+from flask import render_template
 
 import requests
 import json
 
 app = Flask(__name__)
-
-
-@app.route('/')
-def index():
-    return 'Index Page'
-
-@app.route('/combined-stats')
-def get_combined_stats():
-	api_stats = get_stats_from_api()
-	print(api_stats)
-	json_stats = get_stats_from_json()
-	print(json_stats)
-
-	return jsonify(api_stats + json_stats)
 
 def normalize_player_info(player_list, field_names, N=10):
 	players = []
@@ -83,10 +69,18 @@ def get_stats_from_json():
 
 	return normalize_player_info(rawPlayerData['players'], fieldsToPluck, 10)
 
+@app.route('/')
+@app.route('/combined-stats')
+def get_combined_stats():
+	api_stats = get_stats_from_api()
+	json_stats = get_stats_from_json()
+
+	return render_template('player_list.html', data=(api_stats + json_stats))
+
 @app.route('/api-stats')
 def api_stats():
-	return jsonify(get_stats_from_api())
+	return render_template('player_list.html', data=get_stats_from_api())
 
 @app.route('/json-stats')
 def json_stats():
-	return jsonify(get_stats_from_json())
+	return render_template('player_list.html', data=get_stats_from_json())
